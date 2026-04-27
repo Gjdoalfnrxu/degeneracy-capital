@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Degeneracy Capital — Trade</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid #222;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #6366f1;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #e8e8e8; }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-left: 1.5rem;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: #6366f1; }
+
+    .container {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .subtitle {
+      color: #555;
+      font-size: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 2rem;
+    }
+
+    .form-group { margin-bottom: 1.4rem; }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #555;
+      margin-bottom: 0.45rem;
+    }
+
+    input, select {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 4px;
+      color: #e8e8e8;
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.7rem 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+      appearance: none;
+    }
+
+    input:focus, select:focus { border-color: #6366f1; }
+
+    select option { background: #111; }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 4px;
+      color: #555;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.6rem 0.5rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .action-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .action-btn.selected-buy    { border-color: #22c55e; color: #22c55e; background: #0d2218; }
+    .action-btn.selected-sell   { border-color: #ef4444; color: #ef4444; background: #2d0d0d; }
+    .action-btn.selected-short  { border-color: #ef4444; color: #ef4444; background: #2d0d0d; }
+    .action-btn.selected-cover  { border-color: #22c55e; color: #22c55e; background: #0d2218; }
+    .action-btn.selected-call   { border-color: #818cf8; color: #818cf8; background: #1a1a2e; }
+    .action-btn.selected-put    { border-color: #f59e0b; color: #f59e0b; background: #2d1a00; }
+
+    .options-section {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #1a1a1a;
+    }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .submit-btn {
+      width: 100%;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.15s;
+      letter-spacing: 0.03em;
+    }
+    .submit-btn:hover:not(:disabled) { background: #4f51d4; }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .result {
+      margin-top: 1.2rem;
+      padding: 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .result.success { background: #0d2218; border: 1px solid #22c55e; color: #22c55e; }
+    .result.error   { background: #2d0d0d; border: 1px solid #ef4444; color: #ef4444; }
+
+    .price-preview {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 4px;
+      padding: 0.7rem 0.85rem;
+      font-size: 0.85rem;
+      color: #555;
+      min-height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .price-preview .price { color: #fff; font-weight: 700; font-size: 1rem; }
+
+    .quick-tickers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .quick-ticker {
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      border-radius: 3px;
+      color: #444;
+      font-family: inherit;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .quick-ticker:hover { border-color: #6366f1; color: #6366f1; }
+
+    footer {
+      border-top: 1px solid #111;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: #222;
+      font-size: 0.7rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Degeneracy<span>Capital</span></div>
+    <nav>
+      <a href="/">Leaderboard</a>
+      <a href="/trade" class="active">Trade</a>
+      <a href="/prices">Prices</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Execute Trade</h1>
+    <div class="subtitle">Paper money, real degenerate energy.</div>
+
+    <div class="card">
+      <div class="form-group">
+        <label>Player</label>
+        <select id="player">
+          <option value="">Select player...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Ticker</label>
+        <input id="ticker" type="text" placeholder="e.g. NVDA, BTC-USD" autocomplete="off" />
+        <div class="quick-tickers" id="quickTickers"></div>
+      </div>
+
+      <div class="form-group">
+        <label>Current Price</label>
+        <div class="price-preview" id="pricePreview">
+          <span>Enter a ticker to see price</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Action</label>
+        <div class="action-grid" id="actionGrid">
+          <button class="action-btn" data-action="buy">📈 Buy</button>
+          <button class="action-btn" data-action="sell">📉 Sell</button>
+          <button class="action-btn" data-action="short">🐻 Short</button>
+          <button class="action-btn" data-action="cover">🤝 Cover</button>
+          <button class="action-btn" data-action="call">☎️ Call</button>
+          <button class="action-btn" data-action="put">🪃 Put</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Quantity <span id="qtyHint" style="color:#333">(shares)</span></label>
+        <input id="quantity" type="number" min="0.001" step="any" placeholder="100" />
+      </div>
+
+      <div class="options-section" id="optionsSection" style="display:none">
+        <div class="row">
+          <div class="form-group">
+            <label>Strike Price</label>
+            <input id="strike" type="number" min="0.01" step="any" placeholder="150.00" />
+          </div>
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input id="expiry" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submitBtn" onclick="executeTrade()">Execute Trade</button>
+
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <footer>Degeneracy Capital · Not financial advice · Prices via yfinance</footer>
+
+  <script>
+    const WATCHLIST = [
+      'FRO','DHT','NAT','XLE','XOM','RTX','GLD','SONY','MSI','AXON',
+      'AMBA','NVDA','NTR','MOS','CF','APD','LIN','AAL','DAL','BTC-USD','ETH-USD'
+    ];
+
+    let selectedAction = null;
+    let priceTimeout = null;
+
+    // Pre-fill player from URL
+    const params = new URLSearchParams(location.search);
+    const prePlayer = params.get('player');
+
+    // Load players
+    async function loadPlayers() {
+      try {
+        const res = await fetch('/api/players');
+        const data = await res.json();
+        const sel = document.getElementById('player');
+        data.players.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          if (p === prePlayer) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    // Quick ticker buttons
+    const qtDiv = document.getElementById('quickTickers');
+    WATCHLIST.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-ticker';
+      btn.textContent = t;
+      btn.onclick = () => {
+        document.getElementById('ticker').value = t;
+        fetchPrice(t);
+      };
+      qtDiv.appendChild(btn);
+    });
+
+    // Action selection
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.action-btn').forEach(b => b.className = 'action-btn');
+        const action = btn.dataset.action;
+        btn.classList.add(`selected-${action}`);
+        selectedAction = action;
+        const isOption = action === 'call' || action === 'put';
+        document.getElementById('optionsSection').style.display = isOption ? 'block' : 'none';
+        const hint = document.getElementById('qtyHint');
+        hint.textContent = isOption ? '(contracts · 1 contract = 100 shares)' : '(shares)';
+      });
+    });
+
+    // Price fetch on ticker input
+    document.getElementById('ticker').addEventListener('input', e => {
+      clearTimeout(priceTimeout);
+      const val = e.target.value.trim().toUpperCase();
+      if (!val) {
+        document.getElementById('pricePreview').innerHTML = '<span>Enter a ticker to see price</span>';
+        return;
+      }
+      priceTimeout = setTimeout(() => fetchPrice(val), 600);
+    });
+
+    async function fetchPrice(ticker) {
+      const preview = document.getElementById('pricePreview');
+      preview.innerHTML = '<span>Fetching...</span>';
+      try {
+        const res = await fetch(`/api/price/${encodeURIComponent(ticker)}`);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
+        preview.innerHTML = `<span>${ticker}</span><span class="price">$${data.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4})}</span>`;
+      } catch {
+        preview.innerHTML = `<span style="color:#ef4444">No price available for ${ticker}</span>`;
+      }
+    }
+
+    async function executeTrade() {
+      const player   = document.getElementById('player').value;
+      const ticker   = document.getElementById('ticker').value.trim().toUpperCase();
+      const quantity = parseFloat(document.getElementById('quantity').value);
+      const strike   = parseFloat(document.getElementById('strike').value) || null;
+      const expiry   = document.getElementById('expiry').value || null;
+      const result   = document.getElementById('result');
+      const btn      = document.getElementById('submitBtn');
+
+      result.style.display = 'none';
+
+      if (!player) { showResult('error', 'Select a player.'); return; }
+      if (!ticker) { showResult('error', 'Enter a ticker.'); return; }
+      if (!selectedAction) { showResult('error', 'Select an action.'); return; }
+      if (!quantity || quantity <= 0) { showResult('error', 'Enter a valid quantity.'); return; }
+      if ((selectedAction === 'call' || selectedAction === 'put') && (!strike || !expiry)) {
+        showResult('error', 'Options require strike and expiry.'); return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Executing...';
+
+      try {
+        const body = { player, ticker, action: selectedAction, quantity };
+        if (strike) body.strike = strike;
+        if (expiry) body.expiry = expiry;
+
+        const res = await fetch('/api/trade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          showResult('error', data.detail || 'Trade failed.');
+        } else {
+          showResult('success',
+            `✓ ${data.action.toUpperCase()} ${data.quantity.toLocaleString()}x ${data.ticker} @ $${data.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4})}`
+          );
+          // Reset form partially
+          document.getElementById('quantity').value = '';
+          document.getElementById('strike').value = '';
+          document.getElementById('expiry').value = '';
+        }
+      } catch (e) {
+        showResult('error', `Error: ${e.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Execute Trade';
+      }
+    }
+
+    function showResult(type, msg) {
+      const el = document.getElementById('result');
+      el.className = `result ${type}`;
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    loadPlayers();
+  </script>
+</body>
+</html>

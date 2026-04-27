@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Degeneracy Capital — Portfolio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid #222;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #6366f1;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #e8e8e8; }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-left: 1.5rem;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: #6366f1; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .player-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2.5rem;
+      align-items: flex-end;
+    }
+
+    .stat-block { text-align: right; }
+    .stat-label { color: #444; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+    .stat-value { font-size: 1.6rem; font-weight: 800; color: #fff; }
+    .stat-value.big { font-size: 2.2rem; }
+
+    .pnl-positive { color: #22c55e; }
+    .pnl-negative { color: #ef4444; }
+    .pnl-zero     { color: #555; }
+
+    h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #444;
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 0.68rem;
+      color: #444;
+      padding: 0.5rem 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    td { padding: 0.9rem 0.75rem; font-size: 0.85rem; border-bottom: 1px solid #111; }
+    tbody tr:hover { background: #111; }
+
+    .ticker { font-weight: 700; color: #6366f1; font-size: 1rem; }
+    .type-badge {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+    }
+    .type-long  { background: #0d2218; color: #22c55e; }
+    .type-short { background: #2d0d0d; color: #ef4444; }
+    .type-call  { background: #1a1a2e; color: #818cf8; }
+    .type-put   { background: #2d1a00; color: #f59e0b; }
+
+    .trade-action {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .action-buy, .action-cover { color: #22c55e; }
+    .action-sell, .action-short { color: #ef4444; }
+    .action-call { color: #818cf8; }
+    .action-put  { color: #f59e0b; }
+
+    .empty { color: #333; font-size: 0.8rem; padding: 1.5rem 0.75rem; }
+
+    .trade-time { color: #333; font-size: 0.75rem; }
+
+    .trade-btn {
+      display: inline-block;
+      background: #6366f1;
+      color: #fff;
+      text-decoration: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .trade-btn:hover { background: #4f51d4; }
+
+    .loading { text-align: center; padding: 4rem; color: #333; font-size: 0.85rem; }
+    .error   { text-align: center; padding: 4rem; color: #ef4444; font-size: 0.85rem; }
+
+    .option-detail { color: #555; font-size: 0.72rem; margin-top: 0.2rem; }
+
+    footer {
+      border-top: 1px solid #111;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: #222;
+      font-size: 0.7rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Degeneracy<span>Capital</span></div>
+    <nav>
+      <a href="/">Leaderboard</a>
+      <a href="/trade">Trade</a>
+      <a href="/prices">Prices</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="content"><div class="loading">Loading portfolio...</div></div>
+  </div>
+
+  <footer>Degeneracy Capital · Not financial advice · Prices via yfinance</footer>
+
+  <script>
+    const player = decodeURIComponent(location.pathname.split('/').pop());
+
+    function fmt(n) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(n);
+    }
+    function fmtPct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
+    function pnlClass(n) {
+      if (n > 0) return 'pnl-positive';
+      if (n < 0) return 'pnl-negative';
+      return 'pnl-zero';
+    }
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function typeLabel(t) {
+      return `<span class="type-badge type-${t}">${t}</span>`;
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso + 'Z');
+      return d.toLocaleString();
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(`/api/portfolio/${encodeURIComponent(player)}`);
+        if (!res.ok) throw new Error(`Player not found: ${player}`);
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        document.getElementById('content').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      }
+    }
+
+    function render(d) {
+      const pnlCls = pnlClass(d.total_pnl);
+      const sign = d.total_pnl >= 0 ? '+' : '';
+
+      // Positions table
+      let posRows = '';
+      if (!d.positions.length) {
+        posRows = `<tr><td colspan="7" class="empty">No open positions.</td></tr>`;
+      } else {
+        posRows = d.positions.map(p => {
+          const cls = pnlClass(p.pnl);
+          const s = p.pnl >= 0 ? '+' : '';
+          let optDetail = '';
+          if (p.position_type === 'call' || p.position_type === 'put') {
+            optDetail = `<div class="option-detail">Strike ${fmt(p.strike)} · Exp ${esc(p.expiry)}</div>`;
+          }
+          const costLabel = (p.position_type === 'call' || p.position_type === 'put') ? 'Premium' : 'Cost Basis';
+          return `
+            <tr>
+              <td><span class="ticker">${esc(p.ticker)}</span></td>
+              <td>${typeLabel(p.position_type)}</td>
+              <td>${p.quantity.toLocaleString()}</td>
+              <td>${fmt(p.current_price)}</td>
+              <td>${fmt(p.cost_basis)}<div class="option-detail">${costLabel}</div></td>
+              <td>${fmt(p.market_value)}${optDetail}</td>
+              <td class="${cls}">${s}${fmt(p.pnl)}<div class="option-detail ${cls}">${fmtPct(p.pnl_pct)}</div></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Trades table
+      let tradeRows = '';
+      if (!d.trades.length) {
+        tradeRows = `<tr><td colspan="5" class="empty">No trades yet.</td></tr>`;
+      } else {
+        tradeRows = d.trades.map(t => {
+          const aCls = `action-${t.action}`;
+          return `
+            <tr>
+              <td class="trade-time">${fmtTime(t.timestamp)}</td>
+              <td><span class="ticker" style="font-size:0.9rem">${esc(t.ticker)}</span></td>
+              <td><span class="trade-action ${aCls}">${esc(t.action)}</span></td>
+              <td>${Number(t.quantity).toLocaleString()}</td>
+              <td>${fmt(t.price)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('content').innerHTML = `
+        <div class="hero">
+          <div>
+            <div class="player-title">${esc(player)}</div>
+            <a href="/trade?player=${encodeURIComponent(player)}" class="trade-btn">+ New Trade</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-block">
+              <div class="stat-label">Cash</div>
+              <div class="stat-value">${fmt(d.cash)}</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">P&amp;L</div>
+              <div class="stat-value ${pnlCls}">${sign}${fmt(d.total_pnl)}</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">Total Value</div>
+              <div class="stat-value big">${fmt(d.total_value)}</div>
+            </div>
+          </div>
+        </div>
+
+        <h2>Open Positions</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Type</th>
+              <th>Qty</th>
+              <th>Current Price</th>
+              <th>Cost</th>
+              <th>Market Value</th>
+              <th>P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody>${posRows}</tbody>
+        </table>
+
+        <h2>Recent Trades (last 50)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Time (UTC)</th>
+              <th>Ticker</th>
+              <th>Action</th>
+              <th>Qty</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>${tradeRows}</tbody>
+        </table>
+      `;
+    }
+
+    load();
+    setInterval(load, 2 * 60 * 1000);
+  </script>
+</body>
+</html>

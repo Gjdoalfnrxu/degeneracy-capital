@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Degeneracy Capital — Leaderboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid #222;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #6366f1;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: #e8e8e8; }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-left: 1.5rem;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: #6366f1; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      color: #fff;
+    }
+
+    .subtitle {
+      color: #555;
+      font-size: 0.8rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .leaderboard { width: 100%; border-collapse: collapse; }
+
+    .leaderboard thead tr {
+      border-bottom: 1px solid #222;
+    }
+
+    .leaderboard th {
+      text-align: left;
+      font-size: 0.7rem;
+      color: #555;
+      padding: 0.5rem 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .leaderboard tbody tr {
+      border-bottom: 1px solid #161616;
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    .leaderboard tbody tr:hover { background: #111; }
+
+    .leaderboard td {
+      padding: 1.1rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .rank {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #333;
+      width: 3rem;
+    }
+
+    .rank-1 { color: #ffd700; }
+    .rank-2 { color: #aaa; }
+    .rank-3 { color: #cd7f32; }
+
+    .player-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+    }
+
+    .total-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .pnl-positive { color: #22c55e; }
+    .pnl-negative { color: #ef4444; }
+    .pnl-zero     { color: #555; }
+
+    .pnl-amount {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .pnl-pct {
+      font-size: 0.75rem;
+      margin-top: 0.15rem;
+    }
+
+    .cash-col { color: #888; font-size: 0.85rem; }
+
+    .positions-badge {
+      background: #1a1a2e;
+      color: #6366f1;
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: #333;
+      font-size: 0.85rem;
+    }
+
+    .error {
+      text-align: center;
+      padding: 4rem;
+      color: #ef4444;
+      font-size: 0.85rem;
+    }
+
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid #222;
+      color: #555;
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: #6366f1; color: #6366f1; }
+
+    .last-updated { color: #333; font-size: 0.75rem; }
+
+    footer {
+      border-top: 1px solid #111;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: #222;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Degeneracy<span>Capital</span></div>
+    <nav>
+      <a href="/" class="active">Leaderboard</a>
+      <a href="/trade">Trade</a>
+      <a href="/prices">Prices</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Leaderboard</h1>
+    <div class="subtitle">Starting capital: $1,000,000 · Paper trading only · Prices refresh every 15 min</div>
+
+    <div class="refresh-bar">
+      <button class="refresh-btn" onclick="load()">↻ Refresh</button>
+      <span class="last-updated" id="lastUpdated"></span>
+    </div>
+
+    <div id="content">
+      <div class="loading">Loading positions...</div>
+    </div>
+  </div>
+
+  <footer>Degeneracy Capital · Not financial advice · Prices via yfinance</footer>
+
+  <script>
+    function fmt(n) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(n);
+    }
+    function fmtPct(n) {
+      return (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+    }
+    function pnlClass(n) {
+      if (n > 0) return 'pnl-positive';
+      if (n < 0) return 'pnl-negative';
+      return 'pnl-zero';
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/leaderboard');
+        if (!res.ok) throw new Error('Failed to load leaderboard');
+        const data = await res.json();
+        render(data);
+        document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        document.getElementById('content').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+      }
+    }
+
+    function render(data) {
+      if (!data.length) {
+        document.getElementById('content').innerHTML = '<div class="loading">No players found.</div>';
+        return;
+      }
+
+      let rows = data.map(p => {
+        const rankClass = p.rank <= 3 ? `rank-${p.rank}` : '';
+        const cls = pnlClass(p.total_pnl);
+        const sign = p.total_pnl >= 0 ? '+' : '';
+        return `
+          <tr onclick="location.href='/portfolio/${encodeURIComponent(p.player)}'">
+            <td class="rank ${rankClass}">#${p.rank}</td>
+            <td><div class="player-name">${escHtml(p.player)}</div></td>
+            <td><div class="total-value">${fmt(p.total_value)}</div></td>
+            <td>
+              <div class="pnl-amount ${cls}">${sign}${fmt(p.total_pnl)}</div>
+              <div class="pnl-pct ${cls}">${fmtPct(p.total_pnl_pct)}</div>
+            </td>
+            <td class="cash-col">${fmt(p.cash)}</td>
+            <td><span class="positions-badge">${p.position_count} pos</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('content').innerHTML = `
+        <table class="leaderboard">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Player</th>
+              <th>Total Value</th>
+              <th>P&amp;L</th>
+              <th>Cash</th>
+              <th>Positions</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    load();
+    // Auto-refresh every 2 minutes
+    setInterval(load, 2 * 60 * 1000);
+  </script>
+</body>
+</html>

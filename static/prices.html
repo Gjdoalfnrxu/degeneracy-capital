@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Degeneracy Capital — Prices</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0d;
+      color: #e8e8e8;
+      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      min-height: 100vh;
+    }
+
+    header {
+      border-bottom: 1px solid #222;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #6366f1;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: #e8e8e8; }
+
+    nav a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-left: 1.5rem;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: #6366f1; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 2rem; }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .subtitle { color: #555; font-size: 0.8rem; margin-bottom: 2.5rem; }
+
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid #222;
+      color: #555;
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: #6366f1; color: #6366f1; }
+
+    .trigger-btn {
+      background: none;
+      border: 1px solid #222;
+      color: #555;
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .trigger-btn:hover { border-color: #f59e0b; color: #f59e0b; }
+
+    .last-updated { color: #333; font-size: 0.75rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .price-card {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      text-decoration: none;
+    }
+    .price-card:hover { border-color: #6366f1; }
+
+    .ticker {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #6366f1;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .price {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .updated-at {
+      font-size: 0.65rem;
+      color: #333;
+      margin-top: 0.4rem;
+    }
+
+    .stale { border-color: #2d1a00; }
+    .stale .ticker { color: #f59e0b; }
+
+    .no-price {
+      color: #333;
+      font-size: 0.85rem;
+      padding: 4rem;
+      text-align: center;
+    }
+
+    footer {
+      border-top: 1px solid #111;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: #222;
+      font-size: 0.7rem;
+      margin-top: 4rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Degeneracy<span>Capital</span></div>
+    <nav>
+      <a href="/">Leaderboard</a>
+      <a href="/trade">Trade</a>
+      <a href="/prices" class="active">Prices</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h1>Prices</h1>
+    <div class="subtitle">Cached prices · refreshed every 15 minutes</div>
+
+    <div class="refresh-bar">
+      <button class="refresh-btn" onclick="load()">↻ Refresh display</button>
+      <button class="trigger-btn" onclick="triggerRefresh()">⚡ Force price refresh</button>
+      <span class="last-updated" id="lastUpdated"></span>
+    </div>
+
+    <div id="content"><div class="no-price">Loading prices...</div></div>
+  </div>
+
+  <footer>Degeneracy Capital · Not financial advice · Prices via yfinance</footer>
+
+  <script>
+    function fmtPrice(p) {
+      if (p >= 1000) return '$' + p.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+      if (p >= 1)    return '$' + p.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4});
+      return '$' + p.toFixed(6);
+    }
+
+    function fmtTime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso + 'Z');
+      const mins = Math.round((Date.now() - d.getTime()) / 60000);
+      if (mins < 2) return 'just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.round(mins / 60);
+      return `${hrs}h ago`;
+    }
+
+    function isStale(iso) {
+      if (!iso) return true;
+      const d = new Date(iso + 'Z');
+      return (Date.now() - d.getTime()) > 20 * 60 * 1000; // >20 min old
+    }
+
+    const WATCHLIST = [
+      'FRO','DHT','NAT','XLE','XOM','RTX','GLD','SONY','MSI','AXON',
+      'AMBA','NVDA','NTR','MOS','CF','APD','LIN','AAL','DAL','BTC-USD','ETH-USD'
+    ];
+
+    async function load() {
+      try {
+        const res = await fetch('/api/prices');
+        const data = await res.json();
+
+        // Show watchlist first, then any extras
+        const all = [...new Set([...WATCHLIST, ...Object.keys(data)])];
+
+        if (!all.length) {
+          document.getElementById('content').innerHTML = '<div class="no-price">No prices cached yet. Prices refresh in the background.</div>';
+          return;
+        }
+
+        const cards = all.map(ticker => {
+          const entry = data[ticker];
+          if (!entry) {
+            return `
+              <div class="price-card stale">
+                <div class="ticker">${ticker}</div>
+                <div class="price" style="color:#333">—</div>
+                <div class="updated-at">not yet fetched</div>
+              </div>
+            `;
+          }
+          const stale = isStale(entry.updated_at);
+          return `
+            <a href="/trade?player=&ticker=${encodeURIComponent(ticker)}" class="price-card ${stale ? 'stale' : ''}" style="display:block">
+              <div class="ticker">${ticker}</div>
+              <div class="price">${fmtPrice(entry.price)}</div>
+              <div class="updated-at">${fmtTime(entry.updated_at)}${stale ? ' ⚠' : ''}</div>
+            </a>
+          `;
+        }).join('');
+
+        document.getElementById('content').innerHTML = `<div class="grid">${cards}</div>`;
+        document.getElementById('lastUpdated').textContent = 'Displayed at ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        document.getElementById('content').innerHTML = `<div class="no-price" style="color:#ef4444">Error: ${e.message}</div>`;
+      }
+    }
+
+    async function triggerRefresh() {
+      const btn = document.querySelector('.trigger-btn');
+      btn.textContent = '⏳ Refreshing...';
+      btn.disabled = true;
+      try {
+        await fetch('/api/refresh_prices', { method: 'POST' });
+        btn.textContent = '✓ Refresh triggered (15s)';
+        setTimeout(() => { btn.textContent = '⚡ Force price refresh'; btn.disabled = false; }, 15000);
+        setTimeout(load, 5000);
+      } catch {
+        btn.textContent = '⚡ Force price refresh';
+        btn.disabled = false;
+      }
+    }
+
+    load();
+    setInterval(load, 60 * 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Degeneracy Capital — Overview</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+    :root {
+      --blue: #1a6fc4;
+      --sky: #5bbfff;
+      --yellow: #ffdd57;
+      --green: #4ecb71;
+      --red: #ff5252;
+      --orange: #ff9800;
+      --bg: #0e3d6b;
+      --surface: #1255a0;
+      --card: #1a6fc4;
+      --card-light: #2280d8;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(91,191,255,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(78,203,113,0.08) 0%, transparent 50%);
+    }
+
+    header {
+      background: linear-gradient(135deg, #0a2d52 0%, #1255a0 100%);
+      border-bottom: 3px solid var(--sky);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .logo {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+      letter-spacing: 0.5px;
+    }
+    .logo span { color: var(--sky); }
+
+    nav a {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-left: 1.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    nav a.active { background: var(--yellow); color: #0a2d52; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+    .section-label {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      color: var(--yellow);
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    /* SCOREBOARD */
+    .scoreboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-card {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--card-light) 100%);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      transition: transform 0.15s;
+    }
+    .score-card:hover { transform: translateY(-2px); }
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .score-rank {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.5rem;
+      color: rgba(255,255,255,0.2);
+      position: absolute;
+      top: 0.5rem; right: 1rem;
+    }
+    .rank-1 .score-rank { color: var(--yellow); opacity: 0.8; }
+    .rank-2 .score-rank { color: #c0c0c0; opacity: 0.7; }
+    .rank-3 .score-rank { color: #cd7f32; opacity: 0.7; }
+
+    .score-player {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      margin-bottom: 0.25rem;
+    }
+    .score-value {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 0.25rem;
+    }
+    .score-pnl { font-size: 0.85rem; font-weight: 700; }
+    .pos { color: var(--green); } .neg { color: var(--red); } .zero { color: var(--muted); }
+    .score-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+
+    /* POSITION CARDS */
+    .pos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1rem;
+    }
+
+    .pos-card {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--card) 100%);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .pos-card-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--yellow);
+    }
+
+    /* TICKER ROWS */
+    .ticker-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .ticker-row {
+      display: grid;
+      grid-template-columns: 60px 1fr 80px 50px 60px;
+      align-items: center;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 0.4rem 0.75rem;
+      gap: 0.5rem;
+    }
+    .ticker-sym { font-weight: 800; font-size: 0.85rem; }
+    .ticker-sparkline { height: 28px; }
+    .ticker-price { font-size: 0.8rem; color: var(--muted); text-align: right; }
+    .ticker-pnl { font-size: 0.8rem; font-weight: 700; text-align: right; }
+    .ticker-pct { font-size: 0.7rem; text-align: right; }
+    .type-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.15);
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .type-short { background: rgba(255,82,82,0.2); color: #ff9999; }
+    .type-call { background: rgba(78,203,113,0.2); color: #99ffbb; }
+    .type-put { background: rgba(255,152,0,0.2); color: #ffcc80; }
+
+    /* LINE CHART */
+    .chart-wrap {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--card) 100%);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .no-data { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 2rem; }
+
+    footer {
+      border-top: 2px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.75rem;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Degeneracy<span>Capital</span></div>
+  <nav>
+    <a href="/">Leaderboard</a>
+    <a href="/charts" class="active">Overview</a>
+    <a href="/trade">Trade</a>
+    <a href="/prices">Prices</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="section-label">🏆 Scoreboard</div>
+  <div id="scoreboard" class="scoreboard-grid"><div class="no-data">Loading...</div></div>
+
+  <div class="section-label">📈 Value Over Time</div>
+  <div class="chart-wrap">
+    <canvas id="lineChart" style="max-height:300px"></canvas>
+    <div id="lineNoData" class="no-data" style="display:none">Collecting data — charts appear after first price poll (~15 min)</div>
+  </div>
+
+  <div class="section-label">💼 Positions</div>
+  <div id="positionCards" class="pos-grid"></div>
+</div>
+
+<footer>Degeneracy Capital · Not financial advice · Prices via yfinance · Refresh every 15 min</footer>
+
+<script>
+const PLAYER_COLORS = {
+  Chungus: '#6366f1', Fungus: '#4ecb71', Nasseem: '#ffdd57', Gremlin: '#ff5252'
+};
+
+function fmt(n,dec=0){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:dec,maximumFractionDigits:dec}).format(n); }
+function fmtPct(n){ return (n>=0?'+':'')+n.toFixed(2)+'%'; }
+function pnlCls(n){ return n>0?'pos':n<0?'neg':'zero'; }
+
+async function load(){
+  const [lb, hist] = await Promise.all([
+    fetch('/api/leaderboard').then(r=>r.json()),
+    fetch('/api/history').then(r=>r.json()).catch(()=>({}))
+  ]);
+  const portfolios = await Promise.all(
+    lb.map(p=>fetch('/api/portfolio/'+encodeURIComponent(p.player)).then(r=>r.json()))
+  );
+
+  renderScoreboard(lb);
+  renderLineChart(hist);
+  renderPositionCards(lb, portfolios);
+}
+
+function renderScoreboard(data){
+  const html = data.map((p,i)=>{
+    const rnk = i+1;
+    const cls = pnlCls(p.total_pnl);
+    return `<div class="score-card rank-${rnk}">
+      <div class="score-rank">#${rnk}</div>
+      <div class="score-player">${p.player}</div>
+      <div class="score-value">${fmt(p.total_value)}</div>
+      <div class="score-pnl ${cls}">${p.total_pnl>=0?'+':''}${fmt(p.total_pnl)} (${fmtPct(p.total_pnl_pct)})</div>
+      <div class="score-meta">${fmt(p.cash)} cash · ${p.position_count} positions</div>
+    </div>`;
+  }).join('');
+  document.getElementById('scoreboard').innerHTML = html;
+}
+
+function renderLineChart(hist){
+  const hasData = Object.values(hist).some(arr=>arr&&arr.length>1);
+  if(!hasData){
+    document.getElementById('lineNoData').style.display='block';
+    document.getElementById('lineChart').style.display='none';
+    return;
+  }
+  const allTs = [...new Set(Object.values(hist).flatMap(arr=>arr.map(p=>p.ts)))].sort();
+  const labels = allTs.map(ts=>new Date(ts+'Z').toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+  const datasets = Object.entries(hist).map(([player, points])=>{
+    const tsMap = Object.fromEntries(points.map(p=>[p.ts, p.value]));
+    return {
+      label: player,
+      data: allTs.map(ts=>tsMap[ts]??null),
+      borderColor: PLAYER_COLORS[player]||'#6366f1',
+      backgroundColor: 'transparent',
+      tension: 0.4,
+      spanGaps: true,
+      pointRadius: 2,
+      borderWidth: 2.5,
+    };
+  });
+  new Chart(document.getElementById('lineChart'),{
+    type:'line',
+    data:{labels, datasets},
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'rgba(255,255,255,0.7)',font:{size:11,family:'Nunito'}}}},
+      scales:{
+        y:{
+          ticks:{color:'rgba(255,255,255,0.4)',callback:v=>'$'+Math.round(v/1000)+'k'},
+          grid:{color:'rgba(255,255,255,0.05)'},border:{color:'rgba(255,255,255,0.1)'},
+        },
+        x:{
+          ticks:{color:'rgba(255,255,255,0.4)',maxTicksLimit:12},
+          grid:{display:false},border:{color:'rgba(255,255,255,0.1)'}
+        }
+      }
+    }
+  });
+}
+
+function renderPositionCards(lb, portfolios){
+  const cards = lb.map((p,i)=>{
+    const port = portfolios[i];
+    if(!port||!port.positions||!port.positions.length){
+      return `<div class="pos-card"><div class="pos-card-title">${p.player}</div><div class="no-data" style="padding:1rem">No positions yet</div></div>`;
+    }
+    const rows = port.positions.map(pos=>{
+      const cls = pnlCls(pos.pnl);
+      const typeClass = pos.position_type!=='long'?`type-${pos.position_type}`:'';
+      const badge = pos.position_type!=='long'?`<span class="type-badge ${typeClass}">${pos.position_type}</span>`:'';
+      const sparkId = `spark_${p.player}_${pos.ticker}`.replace(/[^a-z0-9]/gi,'_');
+      return `<div class="ticker-row">
+        <div class="ticker-sym">${pos.ticker}${badge}</div>
+        <div class="ticker-sparkline"><canvas id="${sparkId}" width="80" height="28"></canvas></div>
+        <div class="ticker-price">$${(pos.current_price||0).toFixed(2)}</div>
+        <div class="ticker-pnl ${cls}">${pos.pnl>=0?'+':''}${fmt(pos.pnl)}</div>
+        <div class="ticker-pct ${cls}">${fmtPct(pos.pnl_pct||0)}</div>
+      </div>`;
+    }).join('');
+    return `<div class="pos-card">
+      <div class="pos-card-title">${p.player} — ${port.positions.length} positions</div>
+      <div class="ticker-list">${rows}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('positionCards').innerHTML = cards;
+
+  // Draw sparklines for each position (P&L bar as mini chart)
+  lb.forEach((p,i)=>{
+    const port = portfolios[i];
+    if(!port||!port.positions) return;
+    port.positions.forEach(pos=>{
+      const sparkId = `spark_${p.player}_${pos.ticker}`.replace(/[^a-z0-9]/gi,'_');
+      const el = document.getElementById(sparkId);
+      if(!el) return;
+      const pnl = pos.pnl||0;
+      const color = pnl>=0?'#4ecb71':'#ff5252';
+      new Chart(el,{
+        type:'bar',
+        data:{
+          labels:['P&L'],
+          datasets:[{data:[Math.abs(pnl)||1],backgroundColor:color+'99',borderColor:color,borderWidth:1}]
+        },
+        options:{
+          responsive:false,
+          animation:false,
+          plugins:{legend:{display:false},tooltip:{enabled:false}},
+          scales:{x:{display:false},y:{display:false}},
+        }
+      });
+    });
+  });
+}
+
+load();
+setInterval(load, 2*60*1000);
+</script>
+</body>
+</html>
