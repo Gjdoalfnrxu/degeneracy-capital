@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>if(localStorage.getItem('degcap_theme')==='stealth'){document.documentElement.classList.add('stealth');}</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Degeneracy Capital — Overview</title>
@@ -206,6 +207,41 @@
       font-size: 0.75rem;
       margin-top: 3rem;
     }
+
+    @media (max-width: 600px) {
+      header { padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+      .logo { font-size: 1.3rem; }
+      nav a { margin-left: 0.4rem; padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+      #stealthBtn { margin-left: 0.4rem; padding: 0.2rem 0.5rem; font-size: 0.7rem; }
+      .container { padding: 1rem; }
+      h1 { font-size: 1.6rem; }
+    }
+
+    @media (max-width: 700px) {
+      .scoreboard-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 400px) {
+      .scoreboard-grid { grid-template-columns: 1fr !important; }
+    }
+
+    html.stealth body { background: #111 !important; color: #e0e0e0 !important; font-family: Consolas,'Courier New',monospace !important; background-image: none !important; }
+    html.stealth header { background: #1a1a1a !important; border-bottom: 1px solid #333 !important; box-shadow: none !important; }
+    html.stealth .logo { font-family: Consolas,'Courier New',monospace !important; color: #e0e0e0 !important; font-size: 1rem !important; text-shadow: none !important; letter-spacing: 0.1em !important; }
+    html.stealth .logo span { color: #f5a623 !important; }
+    html.stealth nav a { border-radius: 0 !important; padding: 0.3rem 0.6rem !important; color: #888 !important; font-size: 0.8rem !important; }
+    html.stealth nav a.active, html.stealth nav a:hover { background: none !important; color: #f5a623 !important; border-bottom: 1px solid #f5a623 !important; }
+    html.stealth h1, html.stealth h2 { font-family: Consolas,'Courier New',monospace !important; color: #e0e0e0 !important; text-shadow: none !important; }
+    html.stealth .total-value, html.stealth .stat-value, html.stealth .price { font-family: Consolas,'Courier New',monospace !important; color: #f5a623 !important; text-shadow: none !important; }
+    html.stealth .card, html.stealth .price-card, html.stealth .leaderboard tbody tr { background: #1a1a1a !important; border-color: #333 !important; border-radius: 0 !important; box-shadow: none !important; }
+    html.stealth .submit-btn { background: #333 !important; color: #e0e0e0 !important; border-radius: 0 !important; font-family: Consolas,'Courier New',monospace !important; box-shadow: none !important; }
+    html.stealth input, html.stealth select { background: #0a0a0a !important; border-color: #333 !important; border-radius: 0 !important; color: #e0e0e0 !important; font-family: Consolas,'Courier New',monospace !important; }
+    html.stealth footer { background: #0a0a0a !important; border-color: #222 !important; }
+    html.stealth .pnl-positive { color: #00cc44 !important; }
+    html.stealth .pnl-negative { color: #cc3333 !important; }
+    html.stealth .ticker { color: #f5a623 !important; }
+    html.stealth .positions-badge { background: #1a1a1a !important; border-color: #444 !important; color: #888 !important; border-radius: 0 !important; }
+    html.stealth .rank-1 { color: #f5a623 !important; text-shadow: none !important; }
+    html.stealth .section-label { font-family: Consolas,'Courier New',monospace !important; color: #f5a623 !important; text-shadow: none !important; }
   </style>
 </head>
 <body>
@@ -216,6 +252,7 @@
     <a href="/charts" class="active">Overview</a>
     <a href="/trade">Trade</a>
     <a href="/prices">Prices</a>
+    <button id="stealthBtn" onclick="toggleStealth()" style="background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);font-family:inherit;font-size:0.75rem;padding:0.3rem 0.7rem;border-radius:20px;cursor:pointer;margin-left:1rem;">👁 stealth</button>
   </nav>
 </header>
 
@@ -370,6 +407,23 @@ function renderPositionCards(lb, portfolios){
 
 load();
 setInterval(load, 2*60*1000);
+
+function toggleStealth() {
+  const stealth = document.documentElement.classList.toggle('stealth');
+  localStorage.setItem('degcap_theme', stealth ? 'stealth' : 'blues');
+  const btn = document.getElementById('stealthBtn');
+  if (btn) btn.textContent = stealth ? '🎨 colour' : '👁 stealth';
+  const logo = document.querySelector('.logo');
+  if (logo) logo.innerHTML = stealth ? 'DEGCAP <span>ANALYTICS</span>' : 'Degeneracy<span>Capital</span>';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('stealthBtn');
+  const logo = document.querySelector('.logo');
+  if (document.documentElement.classList.contains('stealth')) {
+    if (btn) btn.textContent = '🎨 colour';
+    if (logo) logo.innerHTML = 'DEGCAP <span>ANALYTICS</span>';
+  }
+});
 </script>
 </body>
 </html>
