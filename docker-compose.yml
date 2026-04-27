@@ -1,12 +1,15 @@
 version: "3.8"
 
+volumes:
+  degcap_data:
+
 services:
   degcap:
     build: .
     container_name: degcap
     restart: unless-stopped
     volumes:
-      - /ext/docker/degcap/data:/data
+      - degcap_data:/data
     environment:
       - DB_PATH=/data/degcap.db
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}

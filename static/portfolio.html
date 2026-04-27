@@ -4,40 +4,58 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Degeneracy Capital — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue: #1a6fc4; --sky: #5bbfff; --yellow: #ffdd57;
+      --green: #4ecb71; --red: #ff5252; --orange: #ff9800;
+      --bg: #0e3d6b; --surface: #1255a0; --card: #1a6fc4;
+      --text: #ffffff; --muted: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.15);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0d0d0d;
-      color: #e8e8e8;
-      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
       min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(91,191,255,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(78,203,113,0.08) 0%, transparent 50%);
     }
 
     header {
-      border-bottom: 1px solid #222;
-      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, #0a2d52 0%, #1255a0 100%);
+      border-bottom: 3px solid var(--sky);
+      padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
     .logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #6366f1;
-      letter-spacing: -0.5px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
     }
-    .logo span { color: #e8e8e8; }
+    .logo span { color: var(--sky); }
 
     nav a {
-      color: #888;
+      color: rgba(255,255,255,0.7);
       text-decoration: none;
-      font-size: 0.85rem;
-      margin-left: 1.5rem;
-      transition: color 0.15s;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      transition: all 0.2s;
     }
-    nav a:hover, nav a.active { color: #6366f1; }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    nav a.active { background: var(--yellow); color: #0a2d52; }
 
     .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
 
@@ -50,10 +68,11 @@
     }
 
     .player-title {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 0.3rem;
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.4rem;
+      color: var(--yellow);
+      margin-bottom: 0.6rem;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
     }
 
     .hero-stats {
@@ -63,92 +82,97 @@
     }
 
     .stat-block { text-align: right; }
-    .stat-label { color: #444; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
-    .stat-value { font-size: 1.6rem; font-weight: 800; color: #fff; }
+    .stat-label { color: var(--sky); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; margin-bottom: 0.3rem; }
+    .stat-value { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--yellow); }
     .stat-value.big { font-size: 2.2rem; }
 
-    .pnl-positive { color: #22c55e; }
-    .pnl-negative { color: #ef4444; }
-    .pnl-zero     { color: #555; }
+    .pnl-positive { color: var(--green); }
+    .pnl-negative { color: var(--red); }
+    .pnl-zero     { color: var(--muted); }
 
     h2 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #444;
-      margin-bottom: 1rem;
-      margin-top: 2rem;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.2rem;
+      color: var(--sky);
+      margin-bottom: 0.75rem;
+      margin-top: 2.5rem;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid #1a1a1a;
+      border-bottom: 1px solid var(--border);
     }
 
     table { width: 100%; border-collapse: collapse; }
     th {
       text-align: left;
-      font-size: 0.68rem;
-      color: #444;
+      font-size: 0.7rem;
+      color: var(--sky);
       padding: 0.5rem 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
+      font-weight: 800;
     }
-    td { padding: 0.9rem 0.75rem; font-size: 0.85rem; border-bottom: 1px solid #111; }
-    tbody tr:hover { background: #111; }
+    td {
+      padding: 0.9rem 0.75rem;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.05); }
 
-    .ticker { font-weight: 700; color: #6366f1; font-size: 1rem; }
+    .ticker { font-weight: 800; color: var(--sky); font-size: 1rem; }
     .type-badge {
       display: inline-block;
-      padding: 0.1rem 0.5rem;
-      border-radius: 3px;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
       font-size: 0.68rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      font-weight: 700;
+      font-weight: 800;
     }
-    .type-long  { background: #0d2218; color: #22c55e; }
-    .type-short { background: #2d0d0d; color: #ef4444; }
-    .type-call  { background: #1a1a2e; color: #818cf8; }
-    .type-put   { background: #2d1a00; color: #f59e0b; }
+    .type-long  { background: rgba(78,203,113,0.15); color: var(--green); border: 1px solid rgba(78,203,113,0.3); }
+    .type-short { background: rgba(255,82,82,0.15); color: var(--red); border: 1px solid rgba(255,82,82,0.3); }
+    .type-call  { background: rgba(91,191,255,0.15); color: var(--sky); border: 1px solid rgba(91,191,255,0.3); }
+    .type-put   { background: rgba(255,152,0,0.15); color: var(--orange); border: 1px solid rgba(255,152,0,0.3); }
 
     .trade-action {
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
-    .action-buy, .action-cover { color: #22c55e; }
-    .action-sell, .action-short { color: #ef4444; }
-    .action-call { color: #818cf8; }
-    .action-put  { color: #f59e0b; }
+    .action-buy, .action-cover { color: var(--green); }
+    .action-sell, .action-short { color: var(--red); }
+    .action-call { color: var(--sky); }
+    .action-put  { color: var(--orange); }
 
-    .empty { color: #333; font-size: 0.8rem; padding: 1.5rem 0.75rem; }
+    .empty { color: var(--muted); font-size: 0.85rem; padding: 1.5rem 0.75rem; }
 
-    .trade-time { color: #333; font-size: 0.75rem; }
+    .trade-time { color: var(--muted); font-size: 0.75rem; }
+
+    .option-detail { color: var(--muted); font-size: 0.7rem; margin-top: 0.2rem; }
 
     .trade-btn {
       display: inline-block;
-      background: #6366f1;
-      color: #fff;
+      background: var(--yellow);
+      color: #0a2d52;
       text-decoration: none;
       padding: 0.6rem 1.4rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-family: inherit;
-      font-weight: 600;
-      transition: background 0.15s;
+      border-radius: 20px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1rem;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(255,221,87,0.3);
     }
-    .trade-btn:hover { background: #4f51d4; }
+    .trade-btn:hover { background: #ffe97a; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,221,87,0.4); }
 
-    .loading { text-align: center; padding: 4rem; color: #333; font-size: 0.85rem; }
-    .error   { text-align: center; padding: 4rem; color: #ef4444; font-size: 0.85rem; }
-
-    .option-detail { color: #555; font-size: 0.72rem; margin-top: 0.2rem; }
+    .loading { text-align: center; padding: 4rem; color: var(--muted); font-size: 0.9rem; }
+    .error   { text-align: center; padding: 4rem; color: var(--red); font-size: 0.9rem; }
 
     footer {
-      border-top: 1px solid #111;
+      background: #0a2d52;
+      border-top: 1px solid rgba(255,255,255,0.08);
       padding: 1.5rem 2rem;
       text-align: center;
-      color: #222;
-      font-size: 0.7rem;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.75rem;
       margin-top: 4rem;
     }
   </style>
@@ -160,6 +184,7 @@
       <a href="/">Leaderboard</a>
       <a href="/trade">Trade</a>
       <a href="/prices">Prices</a>
+      <a href="/charts">Charts</a>
     </nav>
   </header>
 
@@ -210,7 +235,6 @@
       const pnlCls = pnlClass(d.total_pnl);
       const sign = d.total_pnl >= 0 ? '+' : '';
 
-      // Positions table
       let posRows = '';
       if (!d.positions.length) {
         posRows = `<tr><td colspan="7" class="empty">No open positions.</td></tr>`;
@@ -237,7 +261,6 @@
         }).join('');
       }
 
-      // Trades table
       let tradeRows = '';
       if (!d.trades.length) {
         tradeRows = `<tr><td colspan="5" class="empty">No trades yet.</td></tr>`;
@@ -282,13 +305,8 @@
         <table>
           <thead>
             <tr>
-              <th>Ticker</th>
-              <th>Type</th>
-              <th>Qty</th>
-              <th>Current Price</th>
-              <th>Cost</th>
-              <th>Market Value</th>
-              <th>P&amp;L</th>
+              <th>Ticker</th><th>Type</th><th>Qty</th>
+              <th>Current Price</th><th>Cost</th><th>Market Value</th><th>P&amp;L</th>
             </tr>
           </thead>
           <tbody>${posRows}</tbody>
@@ -298,11 +316,7 @@
         <table>
           <thead>
             <tr>
-              <th>Time (UTC)</th>
-              <th>Ticker</th>
-              <th>Action</th>
-              <th>Qty</th>
-              <th>Price</th>
+              <th>Time (UTC)</th><th>Ticker</th><th>Action</th><th>Qty</th><th>Price</th>
             </tr>
           </thead>
           <tbody>${tradeRows}</tbody>

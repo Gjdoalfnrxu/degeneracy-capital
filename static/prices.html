@@ -4,139 +4,152 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Degeneracy Capital — Prices</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue: #1a6fc4; --sky: #5bbfff; --yellow: #ffdd57;
+      --green: #4ecb71; --red: #ff5252; --orange: #ff9800;
+      --bg: #0e3d6b; --surface: #1255a0; --card: #1a6fc4;
+      --text: #ffffff; --muted: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.15);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0d0d0d;
-      color: #e8e8e8;
-      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
       min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(91,191,255,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(78,203,113,0.08) 0%, transparent 50%);
     }
 
     header {
-      border-bottom: 1px solid #222;
-      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, #0a2d52 0%, #1255a0 100%);
+      border-bottom: 3px solid var(--sky);
+      padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
     .logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #6366f1;
-      letter-spacing: -0.5px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
     }
-    .logo span { color: #e8e8e8; }
+    .logo span { color: var(--sky); }
 
     nav a {
-      color: #888;
+      color: rgba(255,255,255,0.7);
       text-decoration: none;
-      font-size: 0.85rem;
-      margin-left: 1.5rem;
-      transition: color 0.15s;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      transition: all 0.2s;
     }
-    nav a:hover, nav a.active { color: #6366f1; }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    nav a.active { background: var(--yellow); color: #0a2d52; }
 
     .container { max-width: 860px; margin: 0 auto; padding: 2rem; }
 
     h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 0.4rem;
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.4rem;
+      color: var(--yellow);
+      margin-bottom: 0.3rem;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
     }
-    .subtitle { color: #555; font-size: 0.8rem; margin-bottom: 2.5rem; }
+    .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
 
     .refresh-bar {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.75rem;
       margin-bottom: 1.5rem;
+      flex-wrap: wrap;
     }
 
-    .refresh-btn {
-      background: none;
-      border: 1px solid #222;
-      color: #555;
+    .refresh-btn, .trigger-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      color: rgba(255,255,255,0.7);
       font-family: inherit;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: all 0.2s;
     }
-    .refresh-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .refresh-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .trigger-btn:hover { background: rgba(255,152,0,0.2); border-color: var(--orange); color: var(--orange); }
 
-    .trigger-btn {
-      background: none;
-      border: 1px solid #222;
-      color: #555;
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 0.35rem 0.8rem;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .trigger-btn:hover { border-color: #f59e0b; color: #f59e0b; }
-
-    .last-updated { color: #333; font-size: 0.75rem; }
+    .last-updated { color: var(--muted); font-size: 0.78rem; }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 0.75rem;
     }
 
     .price-card {
-      background: #111;
-      border: 1px solid #1a1a1a;
-      border-radius: 6px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 12px;
       padding: 1rem 1.2rem;
       cursor: pointer;
-      transition: border-color 0.15s;
+      transition: all 0.2s;
       text-decoration: none;
+      display: block;
     }
-    .price-card:hover { border-color: #6366f1; }
+    .price-card:hover { background: rgba(255,255,255,0.12); border-color: var(--sky); transform: translateY(-2px); }
 
     .ticker {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #6366f1;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--sky);
       text-transform: uppercase;
       margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
     }
 
     .price {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #fff;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.5rem;
+      color: var(--yellow);
     }
 
     .updated-at {
       font-size: 0.65rem;
-      color: #333;
+      color: var(--muted);
       margin-top: 0.4rem;
     }
 
-    .stale { border-color: #2d1a00; }
-    .stale .ticker { color: #f59e0b; }
+    .stale { border-color: rgba(255,152,0,0.3); }
+    .stale .ticker { color: var(--orange); }
+    .stale .price  { color: rgba(255,221,87,0.5); }
 
     .no-price {
-      color: #333;
-      font-size: 0.85rem;
+      color: var(--muted);
+      font-size: 0.9rem;
       padding: 4rem;
       text-align: center;
     }
 
     footer {
-      border-top: 1px solid #111;
+      background: #0a2d52;
+      border-top: 1px solid rgba(255,255,255,0.08);
       padding: 1.5rem 2rem;
       text-align: center;
-      color: #222;
-      font-size: 0.7rem;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.75rem;
       margin-top: 4rem;
     }
   </style>
@@ -148,6 +161,7 @@
       <a href="/">Leaderboard</a>
       <a href="/trade">Trade</a>
       <a href="/prices" class="active">Prices</a>
+      <a href="/charts">Charts</a>
     </nav>
   </header>
 
@@ -186,7 +200,7 @@
     function isStale(iso) {
       if (!iso) return true;
       const d = new Date(iso + 'Z');
-      return (Date.now() - d.getTime()) > 20 * 60 * 1000; // >20 min old
+      return (Date.now() - d.getTime()) > 20 * 60 * 1000;
     }
 
     const WATCHLIST = [
@@ -199,7 +213,6 @@
         const res = await fetch('/api/prices');
         const data = await res.json();
 
-        // Show watchlist first, then any extras
         const all = [...new Set([...WATCHLIST, ...Object.keys(data)])];
 
         if (!all.length) {
@@ -213,14 +226,14 @@
             return `
               <div class="price-card stale">
                 <div class="ticker">${ticker}</div>
-                <div class="price" style="color:#333">—</div>
+                <div class="price" style="color:rgba(255,255,255,0.2)">—</div>
                 <div class="updated-at">not yet fetched</div>
               </div>
             `;
           }
           const stale = isStale(entry.updated_at);
           return `
-            <a href="/trade?player=&ticker=${encodeURIComponent(ticker)}" class="price-card ${stale ? 'stale' : ''}" style="display:block">
+            <a href="/trade?player=&ticker=${encodeURIComponent(ticker)}" class="price-card ${stale ? 'stale' : ''}">
               <div class="ticker">${ticker}</div>
               <div class="price">${fmtPrice(entry.price)}</div>
               <div class="updated-at">${fmtTime(entry.updated_at)}${stale ? ' ⚠' : ''}</div>
@@ -231,7 +244,7 @@
         document.getElementById('content').innerHTML = `<div class="grid">${cards}</div>`;
         document.getElementById('lastUpdated').textContent = 'Displayed at ' + new Date().toLocaleTimeString();
       } catch (e) {
-        document.getElementById('content').innerHTML = `<div class="no-price" style="color:#ef4444">Error: ${e.message}</div>`;
+        document.getElementById('content').innerHTML = `<div class="no-price" style="color:var(--red)">Error: ${e.message}</div>`;
       }
     }
 

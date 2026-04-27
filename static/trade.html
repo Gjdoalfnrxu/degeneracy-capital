@@ -4,95 +4,112 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Degeneracy Capital — Trade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --blue: #1a6fc4; --sky: #5bbfff; --yellow: #ffdd57;
+      --green: #4ecb71; --red: #ff5252; --orange: #ff9800;
+      --bg: #0e3d6b; --surface: #1255a0; --card: #1a6fc4;
+      --text: #ffffff; --muted: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.15);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0d0d0d;
-      color: #e8e8e8;
-      font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Cascadia Code', monospace;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nunito', 'Segoe UI', sans-serif;
       min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(91,191,255,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 85% 80%, rgba(78,203,113,0.08) 0%, transparent 50%);
     }
 
     header {
-      border-bottom: 1px solid #222;
-      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, #0a2d52 0%, #1255a0 100%);
+      border-bottom: 3px solid var(--sky);
+      padding: 1rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
 
     .logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #6366f1;
-      letter-spacing: -0.5px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
     }
-    .logo span { color: #e8e8e8; }
+    .logo span { color: var(--sky); }
 
     nav a {
-      color: #888;
+      color: rgba(255,255,255,0.7);
       text-decoration: none;
-      font-size: 0.85rem;
-      margin-left: 1.5rem;
-      transition: color 0.15s;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-left: 1rem;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      transition: all 0.2s;
     }
-    nav a:hover, nav a.active { color: #6366f1; }
+    nav a:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    nav a.active { background: var(--yellow); color: #0a2d52; }
 
-    .container {
-      max-width: 620px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
+    .container { max-width: 620px; margin: 0 auto; padding: 2rem; }
 
     h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 0.4rem;
+      font-family: 'Fredoka One', cursive;
+      font-size: 2.4rem;
+      color: var(--yellow);
+      margin-bottom: 0.3rem;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
     }
 
-    .subtitle {
-      color: #555;
-      font-size: 0.8rem;
-      margin-bottom: 2.5rem;
-    }
+    .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 2rem; }
 
     .card {
-      background: #111;
-      border: 1px solid #1e1e1e;
-      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 2rem;
+      backdrop-filter: blur(8px);
     }
 
     .form-group { margin-bottom: 1.4rem; }
 
     label {
       display: block;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #555;
-      margin-bottom: 0.45rem;
+      letter-spacing: 0.1em;
+      color: var(--sky);
+      margin-bottom: 0.5rem;
+      font-weight: 800;
     }
 
     input, select {
       width: 100%;
-      background: #0d0d0d;
-      border: 1px solid #222;
-      border-radius: 4px;
-      color: #e8e8e8;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #fff;
       font-family: inherit;
-      font-size: 0.9rem;
-      padding: 0.7rem 0.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       appearance: none;
     }
 
-    input:focus, select:focus { border-color: #6366f1; }
+    input:focus, select:focus {
+      border-color: var(--sky);
+      box-shadow: 0 0 0 3px rgba(91,191,255,0.2);
+    }
 
-    select option { background: #111; }
+    select option { background: #0e3d6b; }
 
     .action-grid {
       display: grid;
@@ -101,14 +118,14 @@
     }
 
     .action-btn {
-      background: #0d0d0d;
-      border: 1px solid #222;
-      border-radius: 4px;
-      color: #555;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.5);
       font-family: inherit;
       font-size: 0.8rem;
-      font-weight: 700;
-      padding: 0.6rem 0.5rem;
+      font-weight: 800;
+      padding: 0.65rem 0.5rem;
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -116,89 +133,93 @@
       text-align: center;
     }
 
-    .action-btn:hover { border-color: #6366f1; color: #6366f1; }
-    .action-btn.selected-buy    { border-color: #22c55e; color: #22c55e; background: #0d2218; }
-    .action-btn.selected-sell   { border-color: #ef4444; color: #ef4444; background: #2d0d0d; }
-    .action-btn.selected-short  { border-color: #ef4444; color: #ef4444; background: #2d0d0d; }
-    .action-btn.selected-cover  { border-color: #22c55e; color: #22c55e; background: #0d2218; }
-    .action-btn.selected-call   { border-color: #818cf8; color: #818cf8; background: #1a1a2e; }
-    .action-btn.selected-put    { border-color: #f59e0b; color: #f59e0b; background: #2d1a00; }
+    .action-btn:hover { border-color: var(--sky); color: #fff; background: rgba(91,191,255,0.15); }
+    .action-btn.selected-buy    { border-color: var(--green); color: var(--green); background: rgba(78,203,113,0.15); }
+    .action-btn.selected-sell   { border-color: var(--red); color: var(--red); background: rgba(255,82,82,0.15); }
+    .action-btn.selected-short  { border-color: var(--red); color: var(--red); background: rgba(255,82,82,0.15); }
+    .action-btn.selected-cover  { border-color: var(--green); color: var(--green); background: rgba(78,203,113,0.15); }
+    .action-btn.selected-call   { border-color: var(--sky); color: var(--sky); background: rgba(91,191,255,0.15); }
+    .action-btn.selected-put    { border-color: var(--orange); color: var(--orange); background: rgba(255,152,0,0.15); }
 
     .options-section {
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px solid #1a1a1a;
+      border-top: 1px solid var(--border);
     }
 
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
     .submit-btn {
       width: 100%;
-      background: #6366f1;
-      color: #fff;
+      background: var(--yellow);
+      color: #0a2d52;
       border: none;
-      border-radius: 4px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 700;
+      border-radius: 8px;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.1rem;
+      font-weight: 400;
       padding: 0.9rem;
       cursor: pointer;
       margin-top: 1rem;
-      transition: background 0.15s;
+      transition: all 0.2s;
       letter-spacing: 0.03em;
+      box-shadow: 0 4px 12px rgba(255,221,87,0.3);
     }
-    .submit-btn:hover:not(:disabled) { background: #4f51d4; }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .submit-btn:hover:not(:disabled) { background: #ffe97a; box-shadow: 0 6px 20px rgba(255,221,87,0.4); transform: translateY(-1px); }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .result {
       margin-top: 1.2rem;
       padding: 1rem;
-      border-radius: 4px;
-      font-size: 0.85rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
       display: none;
     }
-    .result.success { background: #0d2218; border: 1px solid #22c55e; color: #22c55e; }
-    .result.error   { background: #2d0d0d; border: 1px solid #ef4444; color: #ef4444; }
+    .result.success { background: rgba(78,203,113,0.15); border: 1px solid var(--green); color: var(--green); }
+    .result.error   { background: rgba(255,82,82,0.15); border: 1px solid var(--red); color: var(--red); }
 
     .price-preview {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      border-radius: 4px;
-      padding: 0.7rem 0.85rem;
-      font-size: 0.85rem;
-      color: #555;
-      min-height: 2.5rem;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 2.8rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .price-preview .price { color: #fff; font-weight: 700; font-size: 1rem; }
+    .price-preview .price { color: var(--yellow); font-family: 'Fredoka One', cursive; font-size: 1.2rem; }
 
     .quick-tickers {
       display: flex;
       flex-wrap: wrap;
       gap: 0.4rem;
-      margin-top: 0.5rem;
+      margin-top: 0.6rem;
     }
     .quick-ticker {
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      border-radius: 3px;
-      color: #444;
+      background: rgba(91,191,255,0.1);
+      border: 1px solid rgba(91,191,255,0.2);
+      border-radius: 999px;
+      color: var(--sky);
       font-family: inherit;
       font-size: 0.7rem;
-      padding: 0.2rem 0.5rem;
+      font-weight: 800;
+      padding: 0.25rem 0.65rem;
       cursor: pointer;
-      transition: all 0.1s;
+      transition: all 0.15s;
     }
-    .quick-ticker:hover { border-color: #6366f1; color: #6366f1; }
+    .quick-ticker:hover { background: rgba(91,191,255,0.25); border-color: var(--sky); }
 
     footer {
-      border-top: 1px solid #111;
+      background: #0a2d52;
+      border-top: 1px solid rgba(255,255,255,0.08);
       padding: 1.5rem 2rem;
       text-align: center;
-      color: #222;
-      font-size: 0.7rem;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.75rem;
       margin-top: 4rem;
     }
   </style>
@@ -210,6 +231,7 @@
       <a href="/">Leaderboard</a>
       <a href="/trade" class="active">Trade</a>
       <a href="/prices">Prices</a>
+      <a href="/charts">Charts</a>
     </nav>
   </header>
 
@@ -251,7 +273,7 @@
       </div>
 
       <div class="form-group">
-        <label>Quantity <span id="qtyHint" style="color:#333">(shares)</span></label>
+        <label>Quantity <span id="qtyHint" style="color:var(--mued);font-weight:600">(shares)</span></label>
         <input id="quantity" type="number" min="0.001" step="any" placeholder="100" />
       </div>
 
@@ -285,11 +307,9 @@
     let selectedAction = null;
     let priceTimeout = null;
 
-    // Pre-fill player from URL
     const params = new URLSearchParams(location.search);
     const prePlayer = params.get('player');
 
-    // Load players
     async function loadPlayers() {
       try {
         const res = await fetch('/api/players');
@@ -305,7 +325,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // Quick ticker buttons
     const qtDiv = document.getElementById('quickTickers');
     WATCHLIST.forEach(t => {
       const btn = document.createElement('button');
@@ -318,7 +337,6 @@
       qtDiv.appendChild(btn);
     });
 
-    // Action selection
     document.querySelectorAll('.action-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.action-btn').forEach(b => b.className = 'action-btn');
@@ -332,7 +350,6 @@
       });
     });
 
-    // Price fetch on ticker input
     document.getElementById('ticker').addEventListener('input', e => {
       clearTimeout(priceTimeout);
       const val = e.target.value.trim().toUpperCase();
@@ -352,7 +369,7 @@
         const data = await res.json();
         preview.innerHTML = `<span>${ticker}</span><span class="price">$${data.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4})}</span>`;
       } catch {
-        preview.innerHTML = `<span style="color:#ef4444">No price available for ${ticker}</span>`;
+        preview.innerHTML = `<span style="color:var(--red)">No price available for ${ticker}</span>`;
       }
     }
 
@@ -362,10 +379,9 @@
       const quantity = parseFloat(document.getElementById('quantity').value);
       const strike   = parseFloat(document.getElementById('strike').value) || null;
       const expiry   = document.getElementById('expiry').value || null;
-      const result   = document.getElementById('result');
       const btn      = document.getElementById('submitBtn');
 
-      result.style.display = 'none';
+      document.getElementById('result').style.display = 'none';
 
       if (!player) { showResult('error', 'Select a player.'); return; }
       if (!ticker) { showResult('error', 'Enter a ticker.'); return; }
@@ -396,7 +412,6 @@
           showResult('success',
             `✓ ${data.action.toUpperCase()} ${data.quantity.toLocaleString()}x ${data.ticker} @ $${data.price.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4})}`
           );
-          // Reset form partially
           document.getElementById('quantity').value = '';
           document.getElementById('strike').value = '';
           document.getElementById('expiry').value = '';
